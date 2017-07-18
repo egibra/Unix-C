@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <aio.h>
+ FILE *file_open(char * path);
+ int read_write(FILE *desk_ro, FILE *desk_wo, int byteCount);
+ FILE *file_open_readonly(char * path);
+
+ FILE *file_open_readonly(char * path){
+     FILE * pFile;
+     pFile = fopen( path, "r");
+     if( pFile == NULL ){
+         perror("open");
+         exit(255);
+     }
+
+     return pFile;
+ }
+
+ FILE *file_open(char * path){
+     FILE *deskr;
+     deskr = fopen( path,"w+" );
+     if( deskr == NULL ){
+         perror("open");
+        exit(255);
+     }
+
+     return deskr;
+ }
+
+ int read_write(FILE *desk_ro, FILE *desk_wo, int byteCount){
+     char buf[100];
+     size_t nbytes;
+     nbytes = sizeof(buf);
+     fread(buf, 1, nbytes ,desk_ro);
+     fwrite(buf,sizeof(char),sizeof(buf),desk_wo);
+     return 0;
+ }
+ int main(int argc, char * argv[] ){
+    FILE *deskr_read=file_open_readonly(argv[1]);
+    FILE *deskr_write=file_open(argv[2]);
+     int buffSize = atoi(argv[3]);
+     read_write(deskr_read, deskr_write, buffSize);
+   printf( "(C) 2017 Egidijus Brazaitis, %s\n", __FILE__ );
+   return 0;
+}

@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <wait.h>
+#include <signal.h>
+#include <stdlib.h>
+
+static int received_sig = 0;
+static int receiced_sig2 = 0;
+
+
+void il_catch_USR2( int );
+void il_catch_USR1( int );
+int il_child( void );
+int il_parent( pid_t pid );
+
+
+int il_child( void ){
+   sleep( 1 );
+   printf( "        vaikas: mano ID = %ld\n", getpid() );
+   while( 1 )
+      if ( received_sig == 1 ){
+          printf( "        gautas signalas, isvedama \"who\" komanda!\n" );
+          system("who");
+          printf("         siunciamas signalas tevui.\n" );
+          kill(getppid(), SIGUSR2);
+           return 0;
+      }
+
+}
+int il_parent( pid_t pid ){
+
+  /* int rv, status;*/
+   printf( "tevas: mano  ID = %ld\n", getpid() );
+   printf( "tevas: mano vaiko  ID = %ld\n", pid );
+   printf( "signalas issiustas.\n" );
+   kill(pid, SIGUSR1);
+   while(1) {
+        if(receiced_sig2 == 1) {
+                printf( "tevas: gautas signalas is vaiko.\n" );
+                printf( "tevas: zudau vaika.\n");
+                kill(pid, SIGINT);
+                break;
+                /*rv = wait (&status);*/
+        }
+   }
+   sleep(5);
+   printf( "tevas: pamiegojau kol mire vaikas, mirstu ir as..\n" );
+   return 0;
+}
+
+void il_catch_USR1( int snum ) {
+   received_sig = 1;
+}
+void il_catch_USR2( int snum ) {
+   receiced_sig2 = 1;
+}
+int main( int argc, char **arg ){
+   pid_t  pid;
+   signal(SIGUSR1, il_catch_USR1);
+   signal(SIGUSR2, il_catch_USR2);
+   switch( pid = fork() ){
+      case 0:              /* fork() grazina 0 vaiko procesui */
+         il_child();
+         break;
+      default:             /* fork() grazina vaiko PID tevo procesui */
+        il_parent(pid);
+         break;
+      case -1:             /* fork() nepavyko */
+         perror("fork");
+         exit(1);
+   }
+   exit(0);
+}

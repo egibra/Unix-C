@@ -1,0 +1,34 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char * argv[])
+{
+if(argc == 2) {
+        int arg = atoi(argv[1]);
+        pid_t vaikas;
+                if((vaikas=fork()) > 0 ) //tecio procesas
+                {
+                return 0;
+                 }
+                if(vaikas==0)
+                {
+                        if(arg > 0)
+                        {
+                        printf("PID: %ld\t PPID: %ld\t ARG: %d\n", (long)getpid(), (long)getppid(), arg);
+                        --arg; char argv[5];
+                        sprintf(argv, "%d", arg);
+                        execl("/export/home/egibra/4_1/loginas_exec01","loginas_exec01", argv,NULL);
+                        sleep(10);
+                        }
+                }
+}
+else
+{
+puts("Perdaug argumentu.");
+}
+
+return 0;
+}

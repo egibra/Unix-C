@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/time.h>
+#include <string.h>
+int eb_test_openw(const char *name);
+int eb_test_open_read(const char *name);
+int eb_test_close(int fd);
+void* eb_test_mmap_read(int d, int size);
+void* eb_test_mmapw( int d, int size );
+int eb_test_munamp( void *a, int size );
+int eb_test_open_read(const char *name)
+{
+ int dskr;
+ dskr = open(name, O_RDONLY);
+ if( dskr == -1 )
+  {
+  perror( name );
+  printf("eb_test_open_read stabdo \n");
+  exit( 255 );
+  }
+  printf( "dskr = %d \n", dskr);
+  return dskr;
+}
+int eb_test_close(int fd){
+   int rv;
+   rv = close( fd );
+   if( rv != 0 ) perror ( "close() failed" );
+   else puts( "closed" );
+   return rv;
+}
+void* eb_test_mmap_read(int d, int size)
+{
+ void *a= NULL;
+ a= mmap( NULL, size, PROT_READ, MAP_SHARED, d, 0);
+ if( a == MAP_FAILED){
+   perror( "mmap failed");
+   abort();
+ }
+  return a;
+}
+void* eb_test_mmapw( int d, int size ){
+   void *a = NULL;
+   a = mmap( NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, d, 0 );
+   if( a == MAP_FAILED ){
+      perror( "mmap failed" );
+      abort();
+   }
+   return a;
+}
+
+int eb_test_munamp( void *a, int size ){
+   int rv;
+   rv = munmap( a, size );
+   if( rv != 0 ){
+      puts( "munmap failed" );
+      abort();
+   }
+   return 1;
+}
+int main( int argc, char * argv[] ){
+   int d, d2;
+   void *a = NULL;
+   void *a2 = NULL;
+   if( argc != 3 ){
+      printf( "Naudojimas:\n %s failas\n", argv[0] );
+      exit( 255 );
+   }
+  d  = eb_test_open_read( argv[1]);
+  d2 = eb_test_openw( argv[2] );
+  struct stat sb;
+   fstat(d, &sb);
+   int fsize = sb.st_size;
+   a = eb_test_mmap_read( d, fsize );
+   a2 = eb_test_mmapw( d2, fsize );
+   printf( " iki cia veikia: \n");
+   memcpy(a2, a, fsize);
+   printf(" turi ir perkopint \n");
+   eb_test_munamp( a, fsize );
+   eb_test_munamp( a2, fsize );
+   /*eb_test_close ( d );
+   eb_test_close( d2 );*/
+  return 0;
+}
+

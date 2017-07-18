@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <dirent.h>
+int get_current_dir();
+int current_dir_notes();
+
+int get_current_dir()
+{
+ char *cwd;
+ int dskr;
+ cwd = getcwd( NULL, pathconf( ".", _PC_PATH_MAX));
+ dskr = open(cwd, O_RDONLY);
+ printf( "Kelias: %s   deskriptorius: %d \n",cwd, dskr );
+ return dskr;
+}
+int current_dir_notes()
+{
+ DIR *dir;
+ struct dirent *ent;
+ dir = fdopendir(get_current_dir());
+ while (( ent=readdir(dir))!= NULL ) {
+       printf ("%s \n", ent->d_name);
+       printf ("%d \n",(int) ent->d_ino);
+ }
+ closedir(dir);
+ return 0;
+
+}
+
+int main()
+{
+ current_dir_notes();
+
+ return 0;
+}

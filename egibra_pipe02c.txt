@@ -1,0 +1,49 @@
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <stdio.h>
+#include <sys/wait.h>
+#include <string.h>
+
+int main (int argc, char *argv[])
+{
+if( argc == 2 ) {
+
+        int     fd[2], nbytes;
+        pid_t   childpid;
+        char    string[80] = "cat ";
+        char    readbuffer[80];
+        strcat(string, argv[1]);
+        pipe(fd);
+
+        if((childpid = fork()) == -1)
+        {
+                perror("fork");
+                exit(1);
+        }
+       if(childpid == 0)
+        {
+
+                /* vaiko proces uzdaro pipe isejima */
+                close(fd[1]);
+
+                /* nuskaito info is pipe */
+                nbytes = read(fd[0], readbuffer, sizeof(readbuffer));
+                system(readbuffer);
+                exit(0);
+       }
+        else
+        {
+
+                /* tevo procesas uzdaro pipe ivesti */
+                close(fd[0]);
+
+                /* siunciama info per outputa pipe */
+                write(fd[1], string, (strlen(string)+1));
+                exit(0);
+
+        }
+
+else printf(" iveskite viena kintamaji. \n");
+        return(0);
+}

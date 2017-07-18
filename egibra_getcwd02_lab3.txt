@@ -1,0 +1,38 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <sys/types.h>
+
+int get_current_cwd();
+int get_current_cwd()
+{
+ char *cwd, *cwd2, *cwd3;
+ int d, d2, d3;
+ cwd = getcwd( NULL, pathconf( ".", _PC_PATH_MAX));
+ /*puts ( cwd );*/
+ d = open( cwd, O_RDONLY);
+ printf ( "kelias: %s  deskriptorius: %d \n ",cwd, d);
+ chdir("/tmp");
+ cwd2 = getcwd( NULL, pathconf (".", _PC_PATH_MAX));
+ d2 = open(cwd2, O_RDONLY);
+ printf (" kelias: %s deskriptorius %d \n", cwd2, d2);
+ fchdir(d);
+ cwd3 = getcwd( NULL, pathconf (".", _PC_PATH_MAX));
+ d3 = open( cwd3, O_RDONLY);
+ printf ("kelias: %s deskriptorius: %d \n", cwd3, d3);
+ close(d);
+ close(d2);
+ close(d3);
+ return 1;
+ }
+
+ int main ()
+{
+  get_current_cwd();
+
+  return 0;
+}
+
+

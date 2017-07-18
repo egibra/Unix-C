@@ -1,0 +1,10 @@
+#include <stdio.h>
+ #include <unistd.h>
+
+int main( int argc, char * argv[] ){
+   int maxNameLength = pathconf("./", _PC_NAME_MAX);
+   int maxPathLength = pathconf("./", _PC_PATH_MAX);
+   printf( "maxNameLength = %d\n", maxNameLength );
+   printf( "maxPathLength = %d\n", maxPathLength );
+   return 0;
+}

@@ -1,0 +1,37 @@
+/* Egidijus Brazaitis IFF - 5/7 */
+
+
+/*
+                         PID : 19506
+                         PPID: 16258
+                        /
+             PID : 19506
+             PPID: 16358
+                        \
+                        PID : 19508
+                        PPID: 19506
+           /
+PID : 19506
+PPID: 16358
+           \
+                        PID : 19507
+                        PPID: 19506
+                        /
+             PID : 19507
+             PPID: 19506
+                        \
+                        PID : 19509
+                        PPID: 19507
+*/
+#include <stdio.h>
+#include <unistd.h>
+int main ( int argc, char * argv[])
+{
+  pid_t pirmas, antras;
+ printf("Pradedamas Procesas\n PID: %ld PPID: %ld \n", (long)getpid(), (long)getppid());
+  pirmas=fork();
+  printf("Po pirmo fork vykdomas kodas: \n PID: %ld PPID: %ld \n", (long)getpid(), (long)getppid());
+  antras=fork();
+  printf("Po antro Fork vykdomas kodas:  \nPID: %ld PPID: %ld \n", (long)getpid(), (long)getppid());
+
+}

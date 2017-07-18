@@ -1,0 +1,45 @@
+#include <unistd.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <sys/types.h>
+#define THREADS  8
+
+void *printme()
+{
+        int i=(int)pthread_self();
+        int n;
+        int factorial = 1;
+        for( n=1; n<=i; ++n)
+        {
+            factorial *= n;
+        }
+        printf("Factorial of %d = %d\n", i, factorial);
+        return NULL;
+}
+
+int main()
+{
+        int i;
+        int *vals;
+        pthread_t *tid_array;
+        vals = (int *)malloc(THREADS*sizeof(int));
+        if(vals == NULL)
+        {
+                exit(1);
+        }
+
+        tid_array = (pthread_t *)malloc(THREADS*sizeof(pthread_t));
+        if(tid_array == NULL)
+        {
+                exit(1);
+        }
+
+        for (i = 0; i < THREADS; i++)
+{
+       pthread_create((&tid_array[i]),NULL,printme,NULL);
+}
+
+        pthread_exit(NULL);
+        return(0);
+}

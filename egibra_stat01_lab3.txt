@@ -1,0 +1,31 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdlib.h>
+int info_about_dir_or_file(int dskr);
+
+int info_about_dir_or_file(int dskr)
+{
+ struct stat finfo;
+ fstat(dskr, &finfo);
+ printf("savininko id: %lx \n",(long) finfo.st_dev);
+ printf("i-Node: %ld \n", finfo.st_ino);
+ printf("leidimai: UID=%ld GID=%ld \n ", (long) finfo.st_uid, (long) finfo.st_gid);
+ return 1;
+}
+
+int main (int argc, char * argv[])
+{
+ int d;
+ if ( argc != 2 )
+ {
+   printf (" Ivedete daugiau nei viena faila ar kataloga");
+   exit( 255 );
+ }
+ d = open(argv[1], O_RDONLY);
+ printf(" deskriptorius: %d \n", d);
+ info_about_dir_or_file( d );
+ return 0;
+}

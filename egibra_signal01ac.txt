@@ -1,0 +1,54 @@
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <stdio.h>
+#include <sys/wait.h>
+
+static int received_sig = 0;
+void il_catch_alarm(int);       /* signalo apdorojimo f-ja */
+int il_child(pid_t pid);                /* vaiko proceso veiksmai */
+void il_parent(pid_t pid);      /* tevo proceso veiksmai */
+
+int il_child(pid_t pid) {
+    printf("        vaikas: as esu vaikas mano pid : %ld\n", pid);
+    printf("        siunciu signala tevui. \n");
+    printf("        vaikas: mirstu. \n");
+    return 0;
+}
+
+void il_parent(pid_t pid) {
+     sleep(2);
+     printf("           as esu tevas, mano  pid: %ld\n", (long)pid);
+     if ( received_sig == 1 ){
+          printf( "             tetis: gavau signala is vaiko! jis mire!\n" );
+          printf( "             as ir mirstu..\n" );
+      }
+   printf("             Miriau po vaiko. \n");
+}
+
+void il_catch_alarm(int snum) {
+    printf("            pagautas signaliukas kai vaikas mirsta, signalo id: %d \n", snum);
+    received_sig = 1;
+}
+
+int main(int argc, char **argv) {
+    pid_t pid;                          /* proceso ID */
+
+    signal(SIGALRM, il_catch_alarm);    /* aptikti vaiko proc pasibaigima ir apdoroti */
+    alarm(2);
+    printf( "(C) 2013 Ingrida Lagzdinyte-Budnike, %s\n", __FILE__ );
+    switch (pid = fork()) {
+    case 0:
+                                /* fork() grazina 0 vaiko procesui */
+        il_child(getpid());
+        break;
+    default:                            /* fork() grazina vaiko PID tevo procesui */
+        il_parent(getpid());
+        break;
+    case -1:                            /* fork() nepavyko */
+        perror("fork");
+        exit(1);
+    }
+    exit(0);
+}
+

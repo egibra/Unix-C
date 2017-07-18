@@ -1,0 +1,25 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main (){
+  pid_t vaikas;
+
+  vaikas = fork();
+
+  if(vaikas == 0){ // vaiko procesas.
+    printf("Vaiko PID: %ld Tevo PPID: %ld\n", (long)getpid(),(long)getppid());
+   sleep(1); // uzmigdom vaika kol baigsis tevas
+    printf("Vaiko po tevo mirties  PID: %ld Tevo PPID: %ld\n", (long)getpid(),(long)getppid());
+
+ }
+  else if(vaikas > 0){ // tecio procesas
+    printf("Tevo PID: %ld Tevo tevo PPID: %ld\n", (long)getpid(),(long)getppid());
+      return 0;
+  }
+  else{ // neveikia forkas :(
+    printf("fork error\n");
+    exit(1);
+  }
+ return 0;
+}

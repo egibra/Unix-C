@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+void *map_file(int descriptor, int fsize);
+void print_byte(void *mappedfile, int place);
+void unmap_file(void *mappedfile, int filesize);
+int open_read(const char* name);
+int open_read(const char *name){
+   int dskr;
+   dskr = open( name, O_RDONLY, 0640 );
+   if( dskr == -1 ){
+      perror( name );
+      exit( 255 );
+   }
+   printf( "dskr = %d\n", dskr );
+   return dskr;
+}
+void *map_file(int descriptor, int fsize) {
+ void *pointit = mmap(NULL, fsize, PROT_READ, MAP_SHARED, descriptor, 0);
+ if( pointit == MAP_FAILED ) {
+    perror( "mmap failed" );
+    abort();
+ }
+ return pointit;
+}
+
+void print_byte(void *mappedfile, int place)
+{
+ char *asChar = (char*)mappedfile;
+ if ((int)asChar[place] == -1) {
+ printf("reiksmes atspausdinti negalima, nes iseinama is prisijungto failo ribu \n");
+ }
+ else{
+  printf("[%d] = %d\n", place, (int)asChar[place]);
+ }
+}
+void unmap_file( void *mappedfile, int filesize){
+ int rv = munmap(mappedfile, filesize);
+ if( rv != 0 ){
+  puts ( "munmap failed" );
+  abort();
+  }
+}
+int main( int argc, char * argv[]) {
+
+ printf (" (C) Egidijus Brazaitis IFF-5/7 3 labaratorinio gynimas \n");
+ if( argc == 1){
+  printf("neivedete jokiu argumentu, iveskite ir bandykite dar karta \n");
+  exit( 255 );
+  }
+  int ds = open_read("/var/lab/ld3tp1/data.bin");
+  struct stat sb;
+  fstat(ds, &sb);
+  int file_size = sb.st_size;
+  void *mappedfile = map_file(ds, file_size);
+  for(int i = 1; i < argc; i++){
+  print_byte(mappedfile, atoi(argv[i]));
+  }
+  unmap_file(mappedfile, file_size);
+
+return 0;
+}
+
+
+
